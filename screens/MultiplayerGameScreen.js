@@ -13,7 +13,7 @@ import {
 import io from "socket.io-client";
 
 // Replace with your actual server IP and port
-const SERVER_URL = "http://192.168.7.180:3000";
+const SERVER_URL = "https://589e-162-83-203-84.ngrok-free.app";
 
 export default function MultiplayerGameScreen({ navigation }) {
   const [socket, setSocket] = useState(null);

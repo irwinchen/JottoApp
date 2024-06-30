@@ -29,7 +29,12 @@ const httpsServer = https.createServer(
   app
 );
 
-const io = new Server();
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
+});
 
 io.attach(httpServer);
 io.attach(httpsServer);
@@ -159,6 +164,11 @@ io.on("connection", (socket) => {
       }
     }
   });
+});
+
+// Your existing Express routes (if any)
+app.get("/", (req, res) => {
+  res.send("Jotto server is running");
 });
 
 const HTTP_PORT = 3000;
