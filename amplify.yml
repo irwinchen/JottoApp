@@ -5,6 +5,7 @@ frontend:
       commands:
         - npm install -g expo-cli
         - yarn install
+        - npx expo install react-native-web react-dom @expo/metro-runtime
     build:
       commands:
         - npx expo export --platform web
