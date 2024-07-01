@@ -7,7 +7,7 @@ frontend:
         - yarn install
     build:
       commands:
-        - expo export:web
+        - npx expo export --platform web
   artifacts:
     baseDirectory: dist
     files:
