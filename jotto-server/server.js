@@ -29,11 +29,13 @@ const httpsServer = https.createServer(
   app
 );
 
-const io = new Server(server, {
+const io = new Server(httpsServer, {
   cors: {
     origin: "*",
     methods: ["GET", "POST"],
+    credentials: true,
   },
+  transports: ["websocket", "polling"],
 });
 
 io.attach(httpServer);
@@ -62,6 +64,12 @@ function countCommonLetters(word1, word2) {
 
 io.on("connection", (socket) => {
   console.log("New connection:", socket.id);
+  console.log("Client address:", socket.handshake.address);
+  console.log("Transport:", socket.conn.transport.name);
+
+  socket.on("error", (error) => {
+    console.error("Socket error:", error);
+  });
 
   // Emit available rooms to the newly connected client
   socket.emit("availableRooms", getAvailableRooms());
@@ -168,6 +176,7 @@ io.on("connection", (socket) => {
 
 // Your existing Express routes (if any)
 app.get("/", (req, res) => {
+  console.log("Received request on root route");
   res.send("Jotto server is running");
 });
 
@@ -196,3 +205,7 @@ for (const interfaceName in networkInterfaces) {
     }
   }
 }
+
+app.get("/test", (req, res) => {
+  res.send("Server is reachable");
+});

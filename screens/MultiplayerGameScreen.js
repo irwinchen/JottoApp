@@ -13,7 +13,7 @@ import {
 import io from "socket.io-client";
 
 // Replace with your actual server IP and port
-const SERVER_URL = "https://589e-162-83-203-84.ngrok-free.app";
+const SERVER_URL = "https://f1b1-162-83-203-84.ngrok-free.app";
 
 export default function MultiplayerGameScreen({ navigation }) {
   const [socket, setSocket] = useState(null);
@@ -30,11 +30,12 @@ export default function MultiplayerGameScreen({ navigation }) {
 
   useEffect(() => {
     const newSocket = io(SERVER_URL, {
-      transports: ["websocket"],
+      transports: ["websocket", "polling"],
       reconnection: true,
-      reconnectionAttempts: 3,
+      reconnectionAttempts: 5,
       reconnectionDelay: 1000,
       timeout: 10000,
+      forceNew: true,
     });
 
     newSocket.on("connect", () => {
@@ -43,10 +44,10 @@ export default function MultiplayerGameScreen({ navigation }) {
     });
 
     newSocket.on("connect_error", (error) => {
-      console.error("Connection error:", error.message);
-      Alert.alert(
-        "Connection Error",
-        "Unable to connect to the game server. Please try again later."
+      console.error("Connection error:", error);
+      console.error(
+        "Error details:",
+        JSON.stringify(error, Object.getOwnPropertyNames(error))
       );
     });
 
