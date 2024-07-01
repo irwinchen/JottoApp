@@ -3,12 +3,13 @@ frontend:
   phases:
     preBuild:
       commands:
+        - npm install -g expo-cli
         - yarn install
     build:
       commands:
-        - yarn run build
+        - expo export:web
   artifacts:
-    baseDirectory: web-build
+    baseDirectory: dist
     files:
       - "**/*"
   cache:
