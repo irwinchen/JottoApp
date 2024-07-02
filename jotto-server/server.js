@@ -21,15 +21,17 @@ function isValidWord(word) {
 }
 
 const httpServer = http.createServer(app);
-const httpsServer = https.createServer(
-  {
-    key: fs.readFileSync("key.pem"),
-    cert: fs.readFileSync("cert.pem"),
-  },
-  app
-);
+// const httpsServer = https.createServer(
+//   {
+//     key: fs.readFileSync("key.pem"),
+//     cert: fs.readFileSync("cert.pem"),
+//   },
+//   app
+// );
+const http = require("http");
+const server = http.createServer(app);
 
-const io = new Server(httpsServer, {
+const io = new Server(httpServer, {
   cors: {
     origin: "*",
     methods: ["GET", "POST"],
@@ -39,7 +41,7 @@ const io = new Server(httpsServer, {
 });
 
 io.attach(httpServer);
-io.attach(httpsServer);
+// io.attach(httpsServer);
 
 const games = new Map();
 
@@ -187,9 +189,9 @@ httpServer.listen(HTTP_PORT, "0.0.0.0", () => {
   console.log(`HTTP Server running on http://localhost:${HTTP_PORT}`);
 });
 
-httpsServer.listen(HTTPS_PORT, "0.0.0.0", () => {
-  console.log(`HTTPS Server running on https://localhost:${HTTPS_PORT}`);
-});
+// httpsServer.listen(HTTPS_PORT, "0.0.0.0", () => {
+//   console.log(`HTTPS Server running on https://localhost:${HTTPS_PORT}`);
+// });
 
 console.log("Server IP addresses:");
 const networkInterfaces = require("os").networkInterfaces();

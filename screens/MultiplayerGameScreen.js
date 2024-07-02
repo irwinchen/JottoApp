@@ -13,7 +13,7 @@ import {
 import io from "socket.io-client";
 
 // Replace with your actual server IP and port
-const SERVER_URL = "https://f1b1-162-83-203-84.ngrok-free.app";
+const SERVER_URL = "https://54.210.190.155:3001";
 
 export default function MultiplayerGameScreen({ navigation }) {
   const [socket, setSocket] = useState(null);
@@ -36,6 +36,7 @@ export default function MultiplayerGameScreen({ navigation }) {
       reconnectionDelay: 1000,
       timeout: 10000,
       forceNew: true,
+      rejectUnauthorized: false,
     });
 
     newSocket.on("connect", () => {
@@ -45,10 +46,10 @@ export default function MultiplayerGameScreen({ navigation }) {
 
     newSocket.on("connect_error", (error) => {
       console.error("Connection error:", error);
-      console.error(
-        "Error details:",
-        JSON.stringify(error, Object.getOwnPropertyNames(error))
-      );
+      console.error("Error name:", error.name);
+      console.error("Error message:", error.message);
+      console.error("Error description:", error.description);
+      console.error("Error stack:", error.stack);
     });
 
     setupSocketListeners(newSocket);
