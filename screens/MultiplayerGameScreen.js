@@ -13,7 +13,7 @@ import {
 import io from "socket.io-client";
 
 // Replace with your actual server IP and port
-const SERVER_URL = "wss://54.210.190.155:3001";
+const SERVER_URL = "wss://54.210.190.155:3002";
 
 export default function MultiplayerGameScreen({ navigation }) {
   const [socket, setSocket] = useState(null);
