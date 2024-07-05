@@ -54,8 +54,13 @@ export default function GameScreen() {
       return;
     }
 
-    if (!isValidGuess(currentGuess) || !isWordInList(currentGuess)) {
+    if (!isValidGuess(currentGuess)) {
       setFeedback("Not a valid word. Try again.");
+      return;
+    }
+
+    if (!isWordInList(currentGuess)) {
+      setFeedback("Is that a real word? It's not in my dictionary. Try again.");
       return;
     }
 

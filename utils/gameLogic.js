@@ -1,18 +1,27 @@
-// A small list of 5-letter words. In a real game, you'd want a much larger list.
-const wordList = [
-  "apple",
-  "beach",
-  "chair",
-  "dance",
-  "eagle",
-  "flame",
-  "grape",
-  "house",
-  "ivory",
-  "jelly",
-];
+import * as FileSystem from "expo-file-system";
+
+let wordList = [];
+
+const loadWordList = async () => {
+  try {
+    const fileUri = `${FileSystem.documentDirectory}five_letter_words.txt`;
+    const fileContent = await FileSystem.readAsStringAsync(fileUri);
+    wordList = fileContent.split("\n").map((word) => word.trim().toLowerCase());
+  } catch (error) {
+    console.error("Error loading word list:", error);
+    // Fallback to a small list if file can't be read
+    wordList = ["apple", "beach", "chair", "dance", "eagle"];
+  }
+};
+
+// Call this function when your app starts
+loadWordList();
 
 export const generateSecretWord = () => {
+  if (wordList.length === 0) {
+    console.warn("Word list is empty. Using fallback word.");
+    return "apple";
+  }
   return wordList[Math.floor(Math.random() * wordList.length)];
 };
 
