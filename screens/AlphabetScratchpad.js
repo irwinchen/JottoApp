@@ -7,7 +7,7 @@ const KEYBOARD = [
   ["ENTER", "Z", "X", "C", "V", "B", "N", "M", "DELETE"],
 ];
 
-const AlphabetScratchpad = ({ onKeyPress, currentGuess }) => {
+const AlphabetScratchpad = ({ onKeyPress, currentGuess, usedLetters }) => {
   return (
     <View style={styles.keyboard}>
       {KEYBOARD.map((row, rowIndex) => (
@@ -19,7 +19,7 @@ const AlphabetScratchpad = ({ onKeyPress, currentGuess }) => {
                 styles.key,
                 key === "ENTER" && styles.enterKey,
                 key === "DELETE" && styles.deleteKey,
-                currentGuess.includes(key.toLowerCase()) && styles.usedKey,
+                usedLetters.includes(key.toLowerCase()) && styles.usedKey,
               ]}
               onPress={() => onKeyPress(key)}
             >
@@ -28,6 +28,14 @@ const AlphabetScratchpad = ({ onKeyPress, currentGuess }) => {
           ))}
         </View>
       ))}
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={[styles.key, styles.clearKey]}
+          onPress={() => onKeyPress("CLEAR")}
+        >
+          <Text style={styles.keyText}>CLEAR</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -62,6 +70,10 @@ const styles = StyleSheet.create({
   },
   usedKey: {
     backgroundColor: "#787c7e",
+  },
+  clearKey: {
+    width: 80,
+    backgroundColor: "#f0ad4e",
   },
 });
 

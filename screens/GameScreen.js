@@ -21,6 +21,7 @@ export default function GameScreen() {
   const [guesses, setGuesses] = useState([]);
   const [feedback, setFeedback] = useState("");
   const [gameOver, setGameOver] = useState(false);
+  const [usedLetters, setUsedLetters] = useState([]);
 
   useEffect(() => {
     startNewGame();
@@ -33,6 +34,7 @@ export default function GameScreen() {
     setGuesses([]);
     setFeedback("");
     setGameOver(false);
+    setUsedLetters([]);
     console.log("Secret word:", newSecretWord); // For testing purposes
   };
 
@@ -43,6 +45,9 @@ export default function GameScreen() {
       setCurrentGuess((prev) => prev.slice(0, -1));
     } else if (key === "ENTER") {
       handleGuess();
+    } else if (key === "CLEAR") {
+      setCurrentGuess("");
+      setUsedLetters([]);
     } else if (currentGuess.length < 5) {
       setCurrentGuess((prev) => prev + key.toLowerCase());
     }
@@ -54,13 +59,8 @@ export default function GameScreen() {
       return;
     }
 
-    if (!isValidGuess(currentGuess)) {
+    if (!isValidGuess(currentGuess) || !isWordInList(currentGuess)) {
       setFeedback("Not a valid word. Try again.");
-      return;
-    }
-
-    if (!isWordInList(currentGuess)) {
-      setFeedback("Is that a real word? It's not in my dictionary. Try again.");
       return;
     }
 
@@ -68,6 +68,11 @@ export default function GameScreen() {
     const newGuess = { word: currentGuess, commonCount };
     const newGuesses = [...guesses, newGuess];
     setGuesses(newGuesses);
+
+    // Update used letters
+    setUsedLetters((prev) => [
+      ...new Set([...prev, ...currentGuess.split("")]),
+    ]);
 
     if (currentGuess.toLowerCase() === secretWord.toLowerCase()) {
       setFeedback("Congratulations! You guessed the word!");
@@ -107,6 +112,7 @@ export default function GameScreen() {
       <AlphabetScratchpad
         onKeyPress={handleKeyPress}
         currentGuess={currentGuess}
+        usedLetters={usedLetters}
       />
       {gameOver && (
         <TouchableOpacity style={styles.button} onPress={startNewGame}>
