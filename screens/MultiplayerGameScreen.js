@@ -121,20 +121,12 @@ export default function MultiplayerGameScreen({ navigation }) {
 
     socket.on("gameOver", ({ winner, word }) => {
       setGameState("gameOver");
-      setFeedback(`Game over! The word was: ${word}`);
       if (winner === socket.id) {
-        Alert.alert(
-          "Congratulations!",
-          `You won! The word was "${word}". Great job!`,
-          [{ text: "OK", onPress: () => setGameState("menu") }]
-        );
+        setWinnerMessage(`Congratulations! You won!`);
       } else {
-        Alert.alert(
-          "Game Over",
-          `You lost. The word was "${word}". Better luck next time!`,
-          [{ text: "OK", onPress: () => setGameState("menu") }]
-        );
+        setWinnerMessage(`You lost. Better luck next time!`);
       }
+      setFeedback(`The word was: ${word}`);
     });
 
     socket.on("playerDisconnected", () => {
@@ -327,6 +319,7 @@ export default function MultiplayerGameScreen({ navigation }) {
                 setSecretWord("");
                 setCurrentGuess("");
                 setFeedback("");
+                setWinnerMessage("");
               }}
             >
               <Text style={styles.buttonText}>Back to Menu</Text>
@@ -442,6 +435,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 20,
     textAlign: "center",
+    color: "#4CAF50", // Green color for emphasis
   },
   feedbackText: {
     fontSize: 18,
