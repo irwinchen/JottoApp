@@ -1,5 +1,4 @@
 const express = require("express");
-const http = require("http");
 const https = require("https");
 const fs = require("fs");
 const { Server } = require("socket.io");
@@ -20,18 +19,15 @@ function isValidWord(word) {
   return dictionary.has(word.toLowerCase());
 }
 
-const httpServer = http.createServer(app);
-// const httpsServer = https.createServer(
-//   {
-//     key: fs.readFileSync("key.pem"),
-//     cert: fs.readFileSync("cert.pem"),
-//   },
-//   app
-// );
-const http = require("http");
-const server = http.createServer(app);
+const httpsServer = https.createServer(
+  {
+    key: fs.readFileSync("key.pem"),
+    cert: fs.readFileSync("cert.pem"),
+  },
+  app
+);
 
-const io = new Server(httpServer, {
+const io = new Server(httpsServer, {
   cors: {
     origin: "*",
     methods: ["GET", "POST"],
@@ -39,9 +35,6 @@ const io = new Server(httpServer, {
   },
   transports: ["websocket", "polling"],
 });
-
-io.attach(httpServer);
-// io.attach(httpsServer);
 
 const games = new Map();
 
@@ -182,16 +175,15 @@ app.get("/", (req, res) => {
   res.send("Jotto server is running");
 });
 
-const HTTP_PORT = 3000;
-const HTTPS_PORT = 3001;
-
-httpServer.listen(HTTP_PORT, "0.0.0.0", () => {
-  console.log(`HTTP Server running on http://localhost:${HTTP_PORT}`);
+app.get("/test", (req, res) => {
+  res.send("Server is reachable");
 });
 
-// httpsServer.listen(HTTPS_PORT, "0.0.0.0", () => {
-//   console.log(`HTTPS Server running on https://localhost:${HTTPS_PORT}`);
-// });
+const HTTPS_PORT = 3002;
+
+httpsServer.listen(HTTPS_PORT, "0.0.0.0", () => {
+  console.log(`HTTPS Server running on https://0.0.0.0:${HTTPS_PORT}`);
+});
 
 console.log("Server IP addresses:");
 const networkInterfaces = require("os").networkInterfaces();
@@ -199,15 +191,8 @@ for (const interfaceName in networkInterfaces) {
   for (const interface of networkInterfaces[interfaceName]) {
     if (interface.family === "IPv4" && !interface.internal) {
       console.log(
-        `  ${interfaceName}: http://${interface.address}:${HTTP_PORT}`
-      );
-      console.log(
         `  ${interfaceName}: https://${interface.address}:${HTTPS_PORT}`
       );
     }
   }
 }
-
-app.get("/test", (req, res) => {
-  res.send("Server is reachable");
-});

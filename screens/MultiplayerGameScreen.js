@@ -41,6 +41,8 @@ export default function MultiplayerGameScreen({ navigation }) {
 
     newSocket.on("connect", () => {
       console.log("Connected to server");
+      console.log("Requesting available rooms...");
+      newSocket.emit("getAvailableRooms");
       setSocket(newSocket);
     });
 
@@ -52,6 +54,10 @@ export default function MultiplayerGameScreen({ navigation }) {
       console.error("Error stack:", error.stack);
     });
 
+    newSocket.on("availableRooms", (rooms) => {
+      console.log("Received available rooms: ", rooms);
+      setAvailableRooms(rooms);
+    });
     setupSocketListeners(newSocket);
 
     return () => {
@@ -165,6 +171,17 @@ export default function MultiplayerGameScreen({ navigation }) {
       setCurrentGuess("");
     }
   };
+  const refreshAvailableRooms = () => {
+    if (socket) {
+      console.log("Refreshing available rooms...");
+      socket.emit("getAvailableRooms");
+    }
+  };
+
+  // Add a refresh button in your UI
+  <TouchableOpacity style={styles.button} onPress={refreshAvailableRooms}>
+    <Text style={styles.buttonText}>Refresh Games</Text>
+  </TouchableOpacity>;
 
   const renderRoomItem = ({ item }) => (
     <TouchableOpacity
