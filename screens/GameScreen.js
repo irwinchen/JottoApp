@@ -60,7 +60,7 @@ export default function GameScreen() {
     }
 
     if (!isValidGuess(currentGuess) || !isWordInList(currentGuess)) {
-      setFeedback("Not a valid word. Try again.");
+      setFeedback("Hm, I don't know that word. Please try another.");
       return;
     }
 

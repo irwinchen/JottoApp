@@ -1,10 +1,11 @@
-import * as FileSystem from "expo-file-system";
+// Import the word list directly
+import wordListRaw from "../assets/five_letter_words.txt";
 
 let wordList = [];
 
 const loadWordList = async () => {
   try {
-    const fileUri = `five_letter_words.txt`;
+    const fileUri = `${FileSystem.documentDirectory}five_letter_words.txt`;
     const fileContent = await FileSystem.readAsStringAsync(fileUri);
     wordList = fileContent.split("\n").map((word) => word.trim().toLowerCase());
   } catch (error) {

@@ -4,9 +4,10 @@ let wordList = [];
 
 const loadWordList = async () => {
   try {
-    const fileUri = `${FileSystem.documentDirectory}five_letter_words.txt`;
-    const fileContent = await FileSystem.readAsStringAsync(fileUri);
-    wordList = fileContent.split("\n").map((word) => word.trim().toLowerCase());
+    const response = await fetch("https://your-server-url.com/words");
+    const words = await response.text();
+    wordList = words.split("\n").map((word) => word.trim().toLowerCase());
+    console.log(`Loaded ${wordList.length} words`);
   } catch (error) {
     console.error("Error loading word list:", error);
     // Fallback to a small list if file can't be read
