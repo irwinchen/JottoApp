@@ -1,36 +1,40 @@
-const fs = require("fs");
-const path = require("path");
+import * as FileSystem from "expo-file-system";
 
-// This function loads words from a file. You should create a file named 'five_letter_words.txt'
-// containing all valid 5-letter words from the OSPD, one word per line.
-function loadDictionary() {
-  const filePath = path.join(__dirname, "five_letter_words.txt");
-  const words = fs
-    .readFileSync(filePath, "utf-8")
-    .split("\n")
-    .map((word) => word.trim().toLowerCase());
-  return new Set(words);
-}
+let wordList = [];
 
-const validWords = loadDictionary();
+const loadWordList = async () => {
+  try {
+    const fileUri = `${FileSystem.documentDirectory}five_letter_words.txt`;
+    const fileContent = await FileSystem.readAsStringAsync(fileUri);
+    wordList = fileContent.split("\n").map((word) => word.trim().toLowerCase());
+  } catch (error) {
+    console.error("Error loading word list:", error);
+    // Fallback to a small list if file can't be read
+    wordList = ["apple", "beach", "chair", "dance", "eagle"];
+  }
+};
 
-function generateSecretWord() {
-  const wordsArray = Array.from(validWords);
-  return wordsArray[Math.floor(Math.random() * wordsArray.length)];
-}
+// Call this function when your app starts
+loadWordList();
 
-function countCommonLetters(word1, word2) {
+export const generateSecretWord = () => {
+  if (wordList.length === 0) {
+    console.warn("Word list is empty. Using fallback word.");
+    return "apple";
+  }
+  return wordList[Math.floor(Math.random() * wordList.length)];
+};
+
+export const countCommonLetters = (word1, word2) => {
   const set1 = new Set(word1.toLowerCase());
   const set2 = new Set(word2.toLowerCase());
   return [...set1].filter((letter) => set2.has(letter)).length;
-}
+};
 
-function isValidWord(word) {
-  return validWords.has(word.toLowerCase());
-}
+export const isValidGuess = (guess) => {
+  return guess.length === 5 && /^[a-zA-Z]+$/.test(guess);
+};
 
-module.exports = {
-  generateSecretWord,
-  countCommonLetters,
-  isValidWord,
+export const isWordInList = (word) => {
+  return wordList.includes(word.toLowerCase());
 };
