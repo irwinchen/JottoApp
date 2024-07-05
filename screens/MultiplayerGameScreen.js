@@ -65,6 +65,7 @@ export default function MultiplayerGameScreen({ navigation }) {
     };
   }, []);
 
+  const [winnerMessage, setWinnerMessage] = useState("");
   const setupSocketListeners = (socket) => {
     socket.on("availableRooms", (rooms) => {
       setAvailableRooms(rooms);
@@ -119,12 +120,21 @@ export default function MultiplayerGameScreen({ navigation }) {
     });
 
     socket.on("gameOver", ({ winner, word }) => {
-      setGameState("menu");
+      setGameState("gameOver");
       setFeedback(`Game over! The word was: ${word}`);
-      Alert.alert(
-        "Game Over",
-        `The winner is ${winner === socket.id ? "you" : "your opponent"}!`
-      );
+      if (winner === socket.id) {
+        Alert.alert(
+          "Congratulations!",
+          `You won! The word was "${word}". Great job!`,
+          [{ text: "OK", onPress: () => setGameState("menu") }]
+        );
+      } else {
+        Alert.alert(
+          "Game Over",
+          `You lost. The word was "${word}". Better luck next time!`,
+          [{ text: "OK", onPress: () => setGameState("menu") }]
+        );
+      }
     });
 
     socket.on("playerDisconnected", () => {
@@ -305,6 +315,24 @@ export default function MultiplayerGameScreen({ navigation }) {
             </ScrollView>
           </View>
         )}
+        {gameState === "gameOver" && (
+          <View style={styles.gameOverContainer}>
+            <Text style={styles.gameOverText}>{winnerMessage}</Text>
+            <Text style={styles.feedbackText}>{feedback}</Text>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                setGameState("menu");
+                setGuesses([]);
+                setSecretWord("");
+                setCurrentGuess("");
+                setFeedback("");
+              }}
+            >
+              <Text style={styles.buttonText}>Back to Menu</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -402,6 +430,22 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     marginBottom: 10,
+    textAlign: "center",
+  },
+  gameOverContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  gameOverText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  feedbackText: {
+    fontSize: 18,
+    marginBottom: 20,
     textAlign: "center",
   },
 });
