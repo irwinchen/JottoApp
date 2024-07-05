@@ -65,7 +65,7 @@ export default function MultiplayerGameScreen({ navigation }) {
     };
   }, []);
 
-  const [winnerMessage, setWinnerMessage] = useState("");
+  const [winnerMessage, setWinnerMessage] = useState({ text: "", color: "" });
   const setupSocketListeners = (socket) => {
     socket.on("availableRooms", (rooms) => {
       setAvailableRooms(rooms);
@@ -122,9 +122,15 @@ export default function MultiplayerGameScreen({ navigation }) {
     socket.on("gameOver", ({ winner, word }) => {
       setGameState("gameOver");
       if (winner === socket.id) {
-        setWinnerMessage(`Congratulations! You won!`);
+        setWinnerMessage({
+          text: `Congratulations! You won!`,
+          color: "#4CAF50",
+        });
       } else {
-        setWinnerMessage(`You lost. Better luck next time!`);
+        setWinnerMessage({
+          text: `You lost. Better luck next time!`,
+          color: "#FF0000",
+        });
       }
       setFeedback(`The word was: ${word}`);
     });
@@ -309,7 +315,9 @@ export default function MultiplayerGameScreen({ navigation }) {
         )}
         {gameState === "gameOver" && (
           <View style={styles.gameOverContainer}>
-            <Text style={styles.gameOverText}>{winnerMessage}</Text>
+            <Text style={[styles.gameOverText, { color: winnerMessage.color }]}>
+              {winnerMessage.text}
+            </Text>
             <Text style={styles.feedbackText}>{feedback}</Text>
             <TouchableOpacity
               style={styles.button}
@@ -319,7 +327,7 @@ export default function MultiplayerGameScreen({ navigation }) {
                 setSecretWord("");
                 setCurrentGuess("");
                 setFeedback("");
-                setWinnerMessage("");
+                setWinnerMessage({ text: "", color: "" });
               }}
             >
               <Text style={styles.buttonText}>Back to Menu</Text>
@@ -435,7 +443,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 20,
     textAlign: "center",
-    color: "#4CAF50", // Green color for emphasis
   },
   feedbackText: {
     fontSize: 18,
