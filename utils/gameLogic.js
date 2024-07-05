@@ -4,7 +4,9 @@ let wordList = [];
 
 const loadWordList = async () => {
   try {
-    const response = await fetch("https://your-server-url.com/words");
+    const response = await fetch(
+      "https://main.d2zhi6x3eeonq9.amplifyapp.com/words"
+    );
     const words = await response.text();
     wordList = words.split("\n").map((word) => word.trim().toLowerCase());
     console.log(`Loaded ${wordList.length} words`);
