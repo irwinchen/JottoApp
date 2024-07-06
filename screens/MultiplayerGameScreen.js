@@ -103,8 +103,9 @@ export default function MultiplayerGameScreen({ navigation }) {
     });
 
     socket.on("invalidWord", (message) => {
-      Alert.alert("Invalid Word", message);
+      console.log("Received invalidWord event:", message);
       setIsSubmitting(false);
+      setFeedback(message || "Invalid word. Please try again.");
     });
 
     socket.on("wordAccepted", () => {
@@ -178,6 +179,14 @@ export default function MultiplayerGameScreen({ navigation }) {
       setIsSubmitting(true);
       setFeedback("Checking word...");
       socket.emit("submitWord", { roomCode, word: secretWord });
+
+      // Add a timeout to handle cases where the server doesn't respond
+      setTimeout(() => {
+        if (isSubmitting) {
+          setIsSubmitting(false);
+          setFeedback("Server not responding. Please try again.");
+        }
+      }, 10000); // 10 seconds timeout
     }
   };
 
