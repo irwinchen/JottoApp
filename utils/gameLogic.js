@@ -1,12 +1,13 @@
-import * as FileSystem from "expo-file-system";
+const SERVER_URL = "https://54.210.190.155:3002";
 
 let wordList = [];
 
 const loadWordList = async () => {
   try {
-    const response = await fetch(
-      "https://main.d2zhi6x3eeonq9.amplifyapp.com/words"
-    );
+    const response = await fetch("${SERVER_URL}/words");
+    if (!response.ok) {
+      throw new Error("Failed to fetch word list");
+    }
     const words = await response.text();
     wordList = words.split("\n").map((word) => word.trim().toLowerCase());
     console.log(`Loaded ${wordList.length} words`);
@@ -39,5 +40,14 @@ export const isValidGuess = (guess) => {
 };
 
 export const isWordInList = (word) => {
+  if (wordList.length === 0) {
+    console.warn("Word list is empty when checking isWordInList");
+  }
   return wordList.includes(word.toLowerCase());
+};
+// At the end of the file
+export const ensureWordListLoaded = async () => {
+  if (wordList.length === 0) {
+    await loadWordList();
+  }
 };

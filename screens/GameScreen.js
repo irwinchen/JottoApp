@@ -12,6 +12,7 @@ import {
   countCommonLetters,
   isValidGuess,
   isWordInList,
+  ensureWordListLoaded,
 } from "../utils/gameLogic";
 import AlphabetScratchpad from "./AlphabetScratchpad";
 
@@ -24,7 +25,11 @@ export default function GameScreen() {
   const [usedLetters, setUsedLetters] = useState([]);
 
   useEffect(() => {
-    startNewGame();
+    const initGame = async () => {
+      await ensureWordListLoaded();
+      startNewGame();
+    };
+    initGame();
   }, []);
 
   const startNewGame = () => {
