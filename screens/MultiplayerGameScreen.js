@@ -11,6 +11,7 @@ import {
   FlatList,
 } from "react-native";
 import io from "socket.io-client";
+import { ensureWordListLoaded } from "../utils/gameLogic";
 
 // Replace with your actual server IP and port
 const SERVER_URL = "wss://54.210.190.155:3002";
@@ -27,6 +28,18 @@ export default function MultiplayerGameScreen({ navigation }) {
   const [availableRooms, setAvailableRooms] = useState([]);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const loadWordList = async () => {
+      try {
+        await ensureWordListLoaded();
+        console.log("Word list loaded successfully");
+      } catch (error) {
+        console.error("Failed to load word list:", error);
+      }
+    };
+    loadWordList();
+  }, []);
 
   useEffect(() => {
     const newSocket = io(SERVER_URL, {

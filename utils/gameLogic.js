@@ -4,7 +4,7 @@ let wordList = [];
 
 const loadWordList = async () => {
   try {
-    const response = await fetch("${SERVER_URL}/words");
+    const response = await fetch(`${SERVER_URL}/words`);
     if (!response.ok) {
       throw new Error("Failed to fetch word list");
     }
