@@ -1,4 +1,4 @@
-const SERVER_URL = "https://54.210.190.155:3002";
+const SERVER_URL = "https://api.jotto.fun";
 
 let wordList = [];
 
