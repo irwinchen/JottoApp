@@ -14,7 +14,7 @@ import io from "socket.io-client";
 import { ensureWordListLoaded } from "../utils/gameLogic";
 
 // Replace with your actual server IP and port
-const SERVER_URL = "wss://54.210.190.155:3002";
+const SERVER_URL = "wss://api.jotto.fun";
 
 export default function MultiplayerGameScreen({ navigation }) {
   const [socket, setSocket] = useState(null);

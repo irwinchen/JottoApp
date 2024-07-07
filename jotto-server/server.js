@@ -1,11 +1,19 @@
 const express = require("express");
+const http = require("http");
 const https = require("https");
 const fs = require("fs");
 const { Server } = require("socket.io");
 const cors = require("cors");
+const path = require("path");
 
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST"],
+    credentials: true,
+  })
+);
 
 // Load the dictionary
 const dictionary = new Set(
@@ -16,20 +24,23 @@ const dictionary = new Set(
 );
 
 function isValidWord(word) {
-  return dictionary.has(word.toLowerCase());
+  console.log(`Checking if word is valid: ${word}`);
+  const result = dictionary.has(word.toLowerCase());
+  console.log(`Word "${word}" is ${result ? "valid" : "invalid"}`);
+  return result;
 }
 
 const httpsServer = https.createServer(
   {
-    key: fs.readFileSync("key.pem"),
-    cert: fs.readFileSync("cert.pem"),
+    key: fs.readFileSync("/home/ec2-user/ssl/key.pem"),
+    cert: fs.readFileSync("/home/ec2-user/ssl/cert.pem"),
   },
   app
 );
 
 const io = new Server(httpsServer, {
   cors: {
-    origin: "*",
+    origin: "https://main.d2zhi6x3eeonq9.amplifyapp.com",
     methods: ["GET", "POST"],
     credentials: true,
   },
