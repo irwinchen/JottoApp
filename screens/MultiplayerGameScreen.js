@@ -28,6 +28,85 @@ export default function MultiplayerGameScreen({ navigation }) {
   const [availableRooms, setAvailableRooms] = useState([]);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState("disconnected");
+
+  const setupSocket = useCallback(() => {
+    const newSocket = io(SERVER_URL, {
+      transports: ["websocket", "polling"],
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+      timeout: 10000,
+      forceNew: true,
+      rejectUnauthorized: false,
+    });
+
+    newSocket.on("connect", () => {
+      console.log("Connected to server");
+      setConnectionStatus("connected");
+      newSocket.emit("getAvailableRooms");
+    });
+
+    newSocket.on("connect_error", (error) => {
+      console.error("Connection error:", error);
+      setConnectionStatus("error");
+      Alert.alert(
+        "Connection Error",
+        "Failed to connect to the game server. Please check your internet connection and try again."
+      );
+    });
+
+    newSocket.on("disconnect", (reason) => {
+      console.log("Disconnected from server:", reason);
+      setConnectionStatus("disconnected");
+    });
+
+    newSocket.on("reconnect", (attemptNumber) => {
+      console.log("Reconnected to server after", attemptNumber, "attempts");
+      setConnectionStatus("connected");
+      newSocket.emit("getAvailableRooms");
+    });
+
+    newSocket.on("availableRooms", (rooms) => {
+      console.log("Received available rooms: ", rooms);
+      setAvailableRooms(rooms);
+    });
+
+    setupSocketListeners(newSocket);
+
+    setSocket(newSocket);
+
+    return () => {
+      newSocket.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    const loadWordList = async () => {
+      try {
+        await ensureWordListLoaded();
+        console.log("Word list loaded successfully");
+      } catch (error) {
+        console.error("Failed to load word list:", error);
+      }
+    };
+    loadWordList();
+
+    return setupSocket();
+  }, [setupSocket]);
+
+  const refreshAvailableRooms = useCallback(() => {
+    if (socket && connectionStatus === "connected") {
+      console.log("Manually refreshing available rooms...");
+      socket.emit("getAvailableRooms");
+    } else {
+      console.log("Cannot refresh rooms. Socket status:", connectionStatus);
+      Alert.alert(
+        "Cannot Refresh",
+        "Not connected to the server. Please check your internet connection."
+      );
+    }
+  }, [socket, connectionStatus]);
 
   useEffect(() => {
     const loadWordList = async () => {
@@ -201,12 +280,6 @@ export default function MultiplayerGameScreen({ navigation }) {
       setCurrentGuess("");
     }
   };
-  const refreshAvailableRooms = () => {
-    if (socket) {
-      console.log("Refreshing available rooms...");
-      socket.emit("getAvailableRooms");
-    }
-  };
 
   // Add a refresh button in your UI
   <TouchableOpacity style={styles.button} onPress={refreshAvailableRooms}>
@@ -233,6 +306,7 @@ export default function MultiplayerGameScreen({ navigation }) {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.innerContainer}>
         <Text style={styles.title}>Multiplayer Jotto</Text>
+        <Text style={styles.connectionStatus}>Status: {connectionStatus}</Text>
 
         {gameState === "menu" && (
           <View style={styles.menuContainer}>
@@ -246,10 +320,15 @@ export default function MultiplayerGameScreen({ navigation }) {
               />
             ) : (
               <Text style={styles.noGamesText}>
-                No one here but you. Why don't you Create a New Game and invite
-                a friend?
+                No open games found. Try refreshing or create a new game!
               </Text>
             )}
+            <TouchableOpacity
+              style={styles.button}
+              onPress={refreshAvailableRooms}
+            >
+              <Text style={styles.buttonText}>Refresh Games</Text>
+            </TouchableOpacity>
             {availableRooms.length > 0 && (
               <TouchableOpacity
                 style={[
@@ -470,5 +549,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginBottom: 20,
     textAlign: "center",
+  },
+  connectionStatus: {
+    fontSize: 14,
+    textAlign: "center",
+    marginBottom: 10,
+    color: "#666",
   },
 });
